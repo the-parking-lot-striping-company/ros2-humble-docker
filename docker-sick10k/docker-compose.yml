@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  realsense_ros2:
+    build:
+      context: ..
+      dockerfile: docker-sick10k/Dockerfile
+      #target: librealsense
+    tty: true
+    ports:
+      - "9090:9090"
+      - "8765:8765"  
+    volumes:
+      - /dev:/dev
+    device_cgroup_rules:
+      - 'c 81:* rmw'
+      - 'c 189:* rmw'
