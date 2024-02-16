@@ -29,8 +29,20 @@ RUN apt-get update \
 RUN apt-get update \
  && apt-get install -y \
     ros-${ROS_DISTRO}-foxglove-bridge \
+    ros-${ROS_DISTRO}-diagnostic-updater \
+    ros-${ROS_DISTRO}-diagnostic-msgs \
  && rm -rf /var/lib/apt/lists/*
 
-RUN source /opt/ros/${ROS_DISTRO}/setup.bash 
+RUN mkdir -p ${WS_DIR}/src \
+ && cd ${WS_DIR}/src \
+ && git clone https://github.com/SICKAG/sick_scan_xd.git \
+ && git clone https://github.com/SICKAG/libsick_ldmrs.git
+
+RUN source /opt/ros/humble/setup.bash \
+   && cd ${WS_DIR} \
+   && colcon build --packages-select libsick_ldmrs --event-handlers console_direct+ \
+   && source ./install/setup.bash \
+   && colcon build --packages-select sick_scan_xd --cmake-args " -DROS_VERSION=2" --event-handlers console_direct+ \
+   && source ./install/setup.bash
 
 ARG DEBIAN_FRONTEND=dialog
